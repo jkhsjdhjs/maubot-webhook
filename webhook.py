@@ -45,7 +45,9 @@ class WebhookPlugin(Plugin):
 
     async def start(self) -> None:
         self.config.load_and_update()
-        self.webapp.add_route(self.config["method"], self.config["path"], self.handle_request)
+        path = self.config["path"]
+        self.webapp.add_route(self.config["method"], path, self.handle_request)
+        self.log.info(f"Webhook available at: {self.webapp_url}{path}")
 
     def substitute_config_template(self, config_key: str, formatting: Dict[str, str]) -> Union[str, Response]:
         try:
