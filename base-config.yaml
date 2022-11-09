@@ -1,0 +1,6 @@
+path: "/send"
+method: "POST"
+room: "!AAAAAAAAAAAAAAAAAA:example.com"
+message: "Hello world!"
+auth_token:
+markdown: false

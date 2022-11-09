@@ -1,0 +1,11 @@
+maubot: 0.3.1
+id: me.jkhsjdhjs.maubot.webhook
+version: 0.1.0
+license: AGPL-3.0-or-later
+modules:
+  - webhook
+main_class: WebhookPlugin
+extra_files:
+  - base-config.yaml
+config: true
+webapp: true
