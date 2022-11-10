@@ -15,4 +15,4 @@ jobs:
     - name: Install pycodestyle
       run: pip install pycodestyle
     - name: Check code style with PyCodestyle
-      run: pycodestyle --count --max-line-length 120 webhook.py
+      run: pycodestyle --count --max-line-length 120 plugin.py
