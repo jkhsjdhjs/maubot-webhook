@@ -11,10 +11,10 @@ jobs:
     name: Publish release
     steps:
     - uses: actions/checkout@v3
-    - name: Setup Python 3.11
+    - name: Setup Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: "3.11"
+        python-version: "3.10"
     - name: Install maubot
       run: pip install maubot
     - name: Build plugin
