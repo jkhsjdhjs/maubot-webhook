@@ -24,4 +24,4 @@ jobs:
       with:
         prerelease: "false"
         assets: |
-        - path: *.mbp
+          - path: *.mbp
