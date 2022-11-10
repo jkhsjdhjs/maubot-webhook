@@ -3,7 +3,7 @@ id: me.jkhsjdhjs.maubot.webhook
 version: 0.1.0
 license: AGPL-3.0-or-later
 modules:
-  - webhook
+  - plugin
 main_class: WebhookPlugin
 extra_files:
   - base-config.yaml
