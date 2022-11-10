@@ -1,0 +1,27 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish release
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Install maubot
+      run: pip install maubot
+    - name: Build plugin
+      run: mbc build
+    - name: Publish release
+      uses: eloquent/github-release-action@v3
+      with:
+        prerelease: "false"
+        assets: |
+        - path: *.mbp
