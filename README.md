@@ -3,7 +3,7 @@ A [maubot](https://github.com/maubot/maubot) plugin to send messages using webho
 
 
 ## Installation
-Either download an `.mbp` file from the [release assets](https://github.com/jkhsjdhjs/maubot-webhook) or [build one yourself](#building).
+Either download an `.mbp` file from the [release assets](https://github.com/jkhsjdhjs/maubot-webhook/releases) or [build one yourself](#building).
 Then, [upload](https://docs.mau.fi/maubot/usage/basic.html#uploading-plugins) it to your maubot instance.
 
 
