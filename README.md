@@ -12,7 +12,7 @@ Create a new instance in the maubot management interface and select `me.jkhsjdhj
 The client selected as `Primary user` will be used to send the messages.
 
 Each instance of this plugin provides a single webhook.
-To create multiple webhooks, just instantiate this plugin as often as you like.
+To create multiple webhooks, just instantiate this plugin multiple times.
 
 
 ## Configuration
@@ -30,22 +30,22 @@ http://your.maubot.instance/_matrix/maubot/plugin/<instance ID>/<path>
 
 The URL under which the webhook is made available is logged on instance startup, so if you're unsure, you can check the logs.
 
-The path supports variable resources, which can be used to extract information from the request URL and format the [`room`](#room) and the [`message`](#message).
+The path supports variable resources, which can be used to extract information from the request URL to format the [`room`](#room) and the [`message`](#message).
 Further information on this can be found in [the formatting section](#formatting).
 
-*If you change this setting while the respective instance is running you have to restart the instance for the change to take effect:
-Click the `Running` switch to disable it, then save. Click the `Running` switch to enable it again, then save again.*
+*The instance has to be restarted for changes to this setting to take effect:
+Click the `Running` switch to stop the instance, then save. Click the `Running` switch again to start it, then save again.*
 
 
 ### `method`
 Specifies the HTTP method that can be used on the given path.
-Should be one of `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `HEAD`, `OPTIONS` or `*` for any methods.
+Should be one of `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `HEAD`, `OPTIONS` or `*` for any method.
 This setting is case-insensitive.
 
 See also: https://docs.aiohttp.org/en/stable/web_reference.html?highlight=add_route#aiohttp.web.UrlDispatcher.add_route
 
-*If you change this setting while the respective instance is running you have to restart the instance for the change to take effect:
-Click the `Running` switch to disable it, then save. Click the `Running` switch to enable it again, then save again.*
+*The instance has to be restarted for changes to this setting to take effect:
+Click the `Running` switch to stop the instance, then save. Click the `Running` switch again to start it, then save again.*
 
 
 ### `room`
