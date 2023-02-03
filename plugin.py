@@ -93,7 +93,8 @@ class WebhookPlugin(Plugin):
                 content_type_header = req.headers.get(hdrs.CONTENT_TYPE).split(';', 1)
                 content_type = content_type_header[0]
                 if content_type != "application/json":
-                    self.log.warning(f"Expected content-type 'application/json', got '{content_type}'. Attempting to parse anyways...")
+                    self.log.warning(f"Expected content-type 'application/json', got '{content_type}'."
+                                     " Attempting to parse anyways...")
             try:
                 req_json = json.loads(await req.text())
             except ValueError as e:
