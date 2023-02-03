@@ -73,11 +73,18 @@ If `false` (the default), the message will be sent as plaintext.
 Otherwise it will be sent as Markdown.
 
 
+### `json`
+This setting takes a boolean and specifies whether the request body should be interpreted and parsed as json or as plaintext.
+If `true`, the top-level JSON keys will be available [for formatting](#formatting).
+For example, a request body of `{"foo": "bar"}` would make the substitution variable `$json_foo` available with the value `bar`.
+
+
 ## Formatting
 The `room` and `message` options can be formatted using values from the path, the query string and the request body.
 Values extracted from the path are available under the same name but with a `$path_` prefix.
 Parameters given in the query string are also available under the same name but with a `$query_` prefix.
 The request body in plain text is available as `$body`.
+If [`json`](#json) is enabled, the top-level JSON keys will also be available with the `$json_` prefix.
 To print a single `$` in the string you can use `$$`, as a single `$` will result in an error.
 
 For example, if the `path` is specified as `/{foo}` and the message is set to `$query_bar $path_foo$body`, a request to `/wor?bar=Hello` with request body `ld!` would result in the message `Hello world!`.

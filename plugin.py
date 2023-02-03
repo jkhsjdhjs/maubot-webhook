@@ -18,6 +18,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import json
 import string
 from typing import Dict, Type, Union
 
@@ -35,6 +36,7 @@ class Config(BaseProxyConfig):
         helper.copy("message")
         helper.copy("auth_token")
         helper.copy("markdown")
+        helper.copy("json")
 
 
 class WebhookPlugin(Plugin):
@@ -83,6 +85,26 @@ class WebhookPlugin(Plugin):
         formatting = {"path_" + k: v for k, v in req.match_info.items()}
         formatting.update({"query_" + k: v for k, v in req.rel_url.query.items()})
         formatting["body"] = await req.text()
+
+        if self.config["json"]:
+            if hdrs.CONTENT_TYPE not in req.headers:
+                self.log.warning(f"Request is missing content-type header! Continuing...")
+            else:
+                content_type_header = req.headers.get(hdrs.CONTENT_TYPE).split(';', 1)
+                content_type = content_type_header[0]
+                if content_type != "application/json":
+                    self.log.warning(f"Expected content-type 'application/json', got '{content_type}'. Attempting to parse anyways...")
+            try:
+                req_json = json.loads(await req.text())
+            except ValueError as e:
+                error_message = f"Failed to parse JSON: {e}"
+                self.log.error(error_message)
+                return Response(status=401, text=error_message)
+            for k, v in req_json.items():
+                if not isinstance(v, (int, float, str)):
+                    self.log.warning(f"Skipping JSON value with key '{k}', since it's not an int, float or string: {v}")
+                    continue
+                formatting.update({"json_" + k: v})
 
         room = self.substitute_config_template("room", formatting)
         message = self.substitute_config_template("message", formatting)
