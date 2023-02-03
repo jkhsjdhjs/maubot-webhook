@@ -70,7 +70,10 @@ class WebhookPlugin(Plugin):
         if self.config["auth_token"] is not None:
             if hdrs.AUTHORIZATION not in req.headers:
                 return Response(status=401, text="Missing authorization header")
-            auth_type, auth_token = req.headers.get(hdrs.AUTHORIZATION).split(' ', 1)
+            auth_header = req.headers.get(hdrs.AUTHORIZATION).split(' ', 1)
+            if len(auth_header) < 2:
+                return Response(status=401, text="Invalid authorization header format")
+            auth_type, auth_token = auth_header
             if auth_type != "Bearer":
                 return Response(status=401, text=f"Unsupported authorization type: {auth_type}")
             if auth_token != self.config["auth_token"]:
