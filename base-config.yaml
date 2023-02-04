@@ -4,4 +4,4 @@ room: "!AAAAAAAAAAAAAAAAAA:example.com"
 message: "Hello world!"
 auth_token:
 markdown: false
-json: false
+force_json: false
