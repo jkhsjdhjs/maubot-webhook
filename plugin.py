@@ -59,8 +59,9 @@ class WebhookPlugin(Plugin):
             return Response(status=500, text=error_message)
         except KeyError as e:
             key = e.args[0]
-            if key.startswith("query_"):
-                return Response(status=400, text=f"Missing query parameter: {key[6:]}")
+            if key.startswith(("query_", "json_")):
+                param_type = key.split('_', 1)[0]
+                return Response(status=400, text=f"Missing {param_type} parameter: {key[len(param_type) + 1:]}")
             error_message = "Missing {} parameter '{}' for config value '{}'! This is a configuration error.".format(
                     *(("path", key[5:]) if key.startswith("path_") else ("formatting", key)), config_key)
             self.log.error(error_message)
