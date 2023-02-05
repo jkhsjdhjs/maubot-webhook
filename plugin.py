@@ -18,13 +18,13 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-import string
 from typing import Dict, Type, Union
 
 from maubot import Plugin
 from aiohttp import hdrs, BasicAuth
 from aiohttp.web import Request, Response
 from mautrix.util.config import BaseProxyConfig, ConfigUpdateHelper
+import jinja2
 
 
 class Config(BaseProxyConfig):
@@ -68,22 +68,11 @@ class WebhookPlugin(Plugin):
         self.webapp.add_route(self.config["method"], path, self.handle_request)
         self.log.info(f"Webhook available at: {self.webapp_url}{path}")
 
-    def substitute_config_template(self, config_key: str, formatting: Dict[str, str]) -> Union[str, Response]:
+    def substitute_config_template(self, config_key: str, variables: Dict) -> Union[str, Response]:
         try:
-            return string.Template(self.config[config_key]).substitute(formatting)
-        except ValueError as e:
-            error_message = f"Error substituting config value '{config_key}': {e}"
-            self.log.error(error_message)
-            return Response(status=500, text=error_message)
-        except KeyError as e:
-            key = e.args[0]
-            if key.startswith(("query_", "json_")):
-                param_type = key.split('_', 1)[0]
-                return Response(status=400, text=f"Missing {param_type} parameter: {key[len(param_type) + 1:]}")
-            error_message = "Missing {} parameter '{}' for config value '{}'! This is a configuration error.".format(
-                    *(("path", key[5:]) if key.startswith("path_") else ("formatting", key)), config_key)
-            self.log.error(error_message)
-            return Response(status=500, text=error_message)
+            return jinja2.Template(self.config[config_key]).render(variables)
+        except jinja2.TemplateSyntaxError as e:
+            return Response(status=500, text=f"Error in {config_key} template: {e}")
 
     async def handle_request(self, req: Request) -> Response:
         self.log.debug(f"Got request {req}")
@@ -116,9 +105,11 @@ class WebhookPlugin(Plugin):
                 return unauthorized("Invalid authorization token")
             self.log.debug(f"Auth token is valid")
 
-        formatting = {"path_" + k: v for k, v in req.match_info.items()}
-        formatting.update({"query_" + k: v for k, v in req.rel_url.query.items()})
-        formatting["body"] = await req.text()
+        template_variables = {
+            "path": dict(req.match_info),
+            "query": dict(req.rel_url.query),
+            "body": await req.text()
+        }
 
         if req.content_type == "application/json" or self.config["force_json"]:
             try:
@@ -126,14 +117,10 @@ class WebhookPlugin(Plugin):
             except ValueError as e:
                 error_message = f"Failed to parse JSON: {e}"
                 return Response(status=401, text=error_message)
-            for k, v in json.items():
-                if not isinstance(v, (int, float, str)):
-                    self.log.warning(f"Skipping JSON value with key '{k}', since it's not an int, float or string: {v}")
-                    continue
-                formatting.update({"json_" + k: v})
+            template_variables["json"] = json
 
-        room = self.substitute_config_template("room", formatting)
-        message = self.substitute_config_template("message", formatting)
+        room = self.substitute_config_template("room", template_variables)
+        message = self.substitute_config_template("message", template_variables)
         if isinstance(room, Response):
             return room
         if isinstance(message, Response):

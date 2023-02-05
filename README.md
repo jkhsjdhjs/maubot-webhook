@@ -2,9 +2,17 @@
 A [maubot](https://github.com/maubot/maubot) plugin to send messages using webhooks.
 
 
+## Features
+- Jinja2 Templating
+- JSON support
+- HTTP Basic and Token Bearer Authorization
+
+
 ## Installation
 Either download an `.mbp` file from the [release assets](https://github.com/jkhsjdhjs/maubot-webhook/releases) or [build one yourself](#building).
 Then, [upload](https://docs.mau.fi/maubot/usage/basic.html#uploading-plugins) it to your maubot instance.
+
+Furthermore this plugin requires Jinja2 for template rendering. But since maubot already depends on Jinja2, you shouldn't have to install it manually.
 
 
 ## Usage
@@ -85,19 +93,16 @@ If `true`, the top-level JSON keys will be available [for formatting](#formattin
 
 
 ## Formatting
-The `room` and `message` options can be formatted using values from the path, the query string and the request body.
-Values extracted from the path are available under the same name but with a `$path_` prefix.
-Parameters given in the query string are also available under the same name but with a `$query_` prefix.
+The `room` and `message` options can be formatted with Jinja2 using values from the path, the query string and the request body.
+Values extracted from the path are available via the `path` variable. A path-variable named `foo` can be accessed via `{{ path.foo }}`.
+Similarly, query parameters are available via the `query` variable.
 The request body in plain text is available as `$body`.
 
-If a request with content-type `application/json` is received (or if [`force_json`](#force_json) is enabled), the request body will be parsed and the top-level JSON keys will be made available for formatting with the `$json_` prefix.
-For example, a request body of `{"foo": "bar"}` would make the substitution variable `$json_foo` available with the value `bar`.
+If a request with content-type `application/json` is received (or if [`force_json`](#force_json) is enabled), the request body will be parsed as such and made available via the `json` variable.
 
-To print a single `$` in the string you can use `$$`, as a single `$` will result in an error.
+For more information on Jinja2 templates please refer to https://jinja.palletsprojects.com/en/3.1.x/templates/.
+For more information on path templating with aiohttp, see https://docs.aiohttp.org/en/stable/web_quickstart.html#variable-resources.
 
-See also:  
-https://docs.aiohttp.org/en/stable/web_quickstart.html#variable-resources  
-https://docs.python.org/3/library/string.html#template-strings
 
 
 ## Building

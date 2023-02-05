@@ -7,5 +7,7 @@ modules:
 main_class: WebhookPlugin
 extra_files:
   - base-config.yaml
+dependencies:
+  - Jinja2~=3.1
 config: true
 webapp: true
