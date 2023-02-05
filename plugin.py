@@ -105,8 +105,13 @@ class WebhookPlugin(Plugin):
             config_auth_token = self.config["auth_token"]
             if auth_type != config_auth_type:
                 return unauthorized(f"Unsupported authorization type: {auth_type}")
-            if auth_type == "Basic" and BasicAuth(*config_auth_token.split(":", 1)) != BasicAuth.decode(auth_header):
-                return unauthorized("Invalid username or password")
+            if auth_type == "Basic":
+                try:
+                    basic_auth_header = BasicAuth.decode(auth_header)
+                except ValueError as e:
+                    return unauthorized(f"Invalid authorization header format: {e}")
+                if BasicAuth(*config_auth_token.split(":", 1)) != basic_auth_header:
+                    return unauthorized("Invalid username or password")
             elif auth_type == "Bearer" and auth_token != config_auth_token:
                 return unauthorized("Invalid authorization token")
             self.log.debug(f"Auth token is valid")
