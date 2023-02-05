@@ -22,17 +22,33 @@ import string
 from typing import Dict, Type, Union
 
 from maubot import Plugin
-from aiohttp import hdrs
+from aiohttp import hdrs, BasicAuth
 from aiohttp.web import Request, Response
 from mautrix.util.config import BaseProxyConfig, ConfigUpdateHelper
 
 
 class Config(BaseProxyConfig):
     def do_update(self, helper: ConfigUpdateHelper) -> None:
+        if "auth_type" not in self and "auth_token" in self:
+            helper.base["auth_type"] = "Bearer"
+
+        valid_auth_types = {"Basic", "Bearer"}
+        auth_type = self["auth_type"]
+        if auth_type is not None:
+            auth_type = auth_type.capitalize()
+            if auth_type not in valid_auth_types:
+                raise ValueError(f"Invalid auth_type '{auth_type}' specified! Only {' and '.join(valid_auth_types)} are supported.")
+            auth_token = self["auth_token"]
+            if auth_token is None:
+                raise ValueError(f"No auth_token specified!")
+            if auth_type == "Basic" and ":" not in auth_token:
+                raise ValueError(f"Invalid auth_token '{auth_token}' specified! For HTTP basic auth, it must contain a username and a password, separated by a colon (<username>:<password>).")
+
         helper.copy("path")
         helper.copy("method")
         helper.copy("room")
         helper.copy("message")
+        helper.copy("auth_type")
         helper.copy("auth_token")
         helper.copy("markdown")
         helper.copy("force_json")
@@ -69,17 +85,28 @@ class WebhookPlugin(Plugin):
 
     async def handle_request(self, req: Request) -> Response:
         self.log.debug(f"Got request {req}")
-        if self.config["auth_token"] is not None:
+        config_auth_type = self.config["auth_type"]
+
+        def unauthorized(text):
+            return Response(status=401, headers={hdrs.WWW_AUTHENTICATE: config_auth_type}, text=text)
+
+        if config_auth_type is not None:
+            config_auth_type = config_auth_type.capitalize()
             if hdrs.AUTHORIZATION not in req.headers:
-                return Response(status=401, text="Missing authorization header")
-            auth_header = req.headers.get(hdrs.AUTHORIZATION).split(' ', 1)
-            if len(auth_header) < 2:
-                return Response(status=401, text="Invalid authorization header format")
-            auth_type, auth_token = auth_header
-            if auth_type != "Bearer":
-                return Response(status=401, text=f"Unsupported authorization type: {auth_type}")
-            if auth_token != self.config["auth_token"]:
-                return Response(status=401, text="Invalid authorization token")
+                return unauthorized("Missing authorization header")
+            auth_header = req.headers.get(hdrs.AUTHORIZATION)
+            auth_header_split = auth_header.split(' ', 1)
+            if len(auth_header_split) < 2:
+                return unauthorized("Invalid authorization header format")
+            auth_type, auth_token = auth_header_split
+            auth_type = auth_type.capitalize()
+            config_auth_token = self.config["auth_token"]
+            if auth_type != config_auth_type:
+                return unauthorized(f"Unsupported authorization type: {auth_type}")
+            if auth_type == "Basic" and BasicAuth(*config_auth_token.split(":", 1)) != BasicAuth.decode(auth_header):
+                return unauthorized("Invalid username or password")
+            elif auth_type == "Bearer" and auth_token != config_auth_token:
+                return unauthorized("Invalid authorization token")
             self.log.debug(f"Auth token is valid")
 
         formatting = {"path_" + k: v for k, v in req.match_info.items()}

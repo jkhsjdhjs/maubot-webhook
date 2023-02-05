@@ -2,6 +2,7 @@ path: "/send"
 method: "POST"
 room: "!AAAAAAAAAAAAAAAAAA:example.com"
 message: "Hello world!"
+auth_type:
 auth_token:
 markdown: false
 force_json: false
