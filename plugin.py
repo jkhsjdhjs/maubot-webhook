@@ -37,12 +37,14 @@ class Config(BaseProxyConfig):
         if auth_type is not None:
             auth_type = auth_type.capitalize()
             if auth_type not in valid_auth_types:
-                raise ValueError(f"Invalid auth_type '{auth_type}' specified! Only {' and '.join(valid_auth_types)} are supported.")
+                raise ValueError(f"Invalid auth_type '{auth_type}' specified! Only {' and '.join(valid_auth_types)} "
+                                 "are supported.")
             auth_token = self["auth_token"]
             if auth_token is None:
                 raise ValueError(f"No auth_token specified!")
             if auth_type == "Basic" and ":" not in auth_token:
-                raise ValueError(f"Invalid auth_token '{auth_token}' specified! For HTTP basic auth, it must contain a username and a password, separated by a colon (<username>:<password>).")
+                raise ValueError(f"Invalid auth_token '{auth_token}' specified! For HTTP basic auth, it must contain "
+                                 "a username and a password, separated by a colon (<username>:<password>).")
 
         helper.copy("path")
         helper.copy("method")
