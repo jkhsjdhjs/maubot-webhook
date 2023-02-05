@@ -88,8 +88,6 @@ Otherwise it will be sent as Markdown.
 ### `force_json`
 This setting takes a boolean and specifies whether the request body should be interpreted and parsed as json, even if the content type says otherwise.
 
-If `true`, the top-level JSON keys will be available [for formatting](#formatting).
-
 
 
 ## Formatting
