@@ -100,8 +100,8 @@ The request body in plain text is available as `$body`.
 
 If a request with content-type `application/json` is received (or if [`force_json`](#force_json) is enabled), the request body will be parsed as such and made available via the `json` variable.
 
-For more information on Jinja2 templates please refer to https://jinja.palletsprojects.com/en/3.1.x/templates/.
-For more information on path templating with aiohttp, see https://docs.aiohttp.org/en/stable/web_quickstart.html#variable-resources.
+For more information on Jinja2 templates please refer to https://jinja.palletsprojects.com/en/3.1.x/templates/.  
+For more information on URL path templates in aiohttp, see https://docs.aiohttp.org/en/stable/web_quickstart.html#variable-resources.
 
 
 
