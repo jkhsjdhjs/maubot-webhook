@@ -71,7 +71,7 @@ class WebhookPlugin(Plugin):
     def substitute_config_template(self, config_key: str, variables: Dict) -> Union[str, Response]:
         try:
             return jinja2.Template(self.config[config_key]).render(variables)
-        except jinja2.TemplateSyntaxError as e:
+        except (jinja2.TemplateSyntaxError, jinja2.UndefinedError) as e:
             return Response(status=500, text=f"Error in {config_key} template: {e}")
 
     async def handle_request(self, req: Request) -> Response:
