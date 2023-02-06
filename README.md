@@ -44,9 +44,9 @@ force_json: false
 $ curl -X POST -H "Content-Type: application/json" -u abc:123 https://your.maubot.instance/_matrix/maubot/plugin/<instance ID>/send -d '
 {
     "title": "This is a test message:",
-    "list":[
-        "Hello", 
-        "World!" 
+    "list": [
+        "Hello",
+        "World!"
     ]
 }'
 ```
