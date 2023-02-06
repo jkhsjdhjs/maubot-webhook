@@ -3,9 +3,9 @@ A [maubot](https://github.com/maubot/maubot) plugin to send messages using webho
 
 
 ## Features
-- Jinja2 Templating
+- Jinja2 templating
 - JSON support
-- HTTP Basic and Token Bearer Authorization
+- HTTP Basic and Token Bearer authorization
 
 
 ## Installation
@@ -23,6 +23,37 @@ Each instance of this plugin provides a single webhook.
 To create multiple webhooks, just instantiate this plugin multiple times.
 
 
+## Example
+
+```yaml
+path: /send
+method: POST
+room: '!AAAAAAAAAAAAAAAAAA:example.com'
+message: |
+    **{{ json.title }}**
+    {% for text in json.list %}
+    - {{ text }}
+    {% endfor %}
+auth_type: Basic
+auth_token: abc:123
+markdown: true
+force_json: false
+```
+
+```bash
+$ curl -X POST -H "Content-Type: application/json" -u abc:123 https://your.maubot.instance/_matrix/maubot/plugin/<instance ID>/send -d '
+{
+    "title": "This is a test message:",
+    "list":[
+        "Hello", 
+        "World!" 
+    ]
+}'
+```
+
+![Screenshot of the resulting message](https://screens.totally.rip/2023/02/63e0f862ca140.png)
+
+
 ## Configuration
 This plugin has the following settings you can configure:
 
@@ -33,7 +64,7 @@ It must start with a `/` or be empty.
 It is relative to the webapp base URL of the instance:
 
 ```
-http://your.maubot.instance/_matrix/maubot/plugin/<instance ID>/<path>
+https://your.maubot.instance/_matrix/maubot/plugin/<instance ID>/<path>
 ```
 
 The URL under which the webhook is made available is logged on instance startup, so if you're unsure, you can check the logs.
@@ -92,9 +123,9 @@ This setting takes a boolean and specifies whether the request body should be in
 
 ## Formatting
 The `room` and `message` options can be formatted with Jinja2 using values from the path, the query string and the request body.
-Values extracted from the path are available via the `path` variable. A path-variable named `foo` can be accessed via `{{ path.foo }}`.
+Values extracted from the path are available via the `path` variable.
 Similarly, query parameters are available via the `query` variable.
-The request body in plain text is available as `$body`.
+The request body in plain text is available as `body`.
 
 If a request with content-type `application/json` is received (or if [`force_json`](#force_json) is enabled), the request body will be parsed as such and made available via the `json` variable.
 
