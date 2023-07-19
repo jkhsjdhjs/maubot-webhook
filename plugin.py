@@ -72,7 +72,9 @@ class WebhookPlugin(Plugin):
         try:
             return jinja2.Template(self.config[config_key]).render(variables)
         except (jinja2.TemplateSyntaxError, jinja2.UndefinedError) as e:
-            return Response(status=500, text=f"Error in {config_key} template: {e}")
+            error_message = f"Error in {config_key} template: {e}"
+            self.log.error(error_message)
+            return Response(status=500, text=error_message)
 
     async def handle_request(self, req: Request) -> Response:
         self.log.debug(f"Got request {req}")
