@@ -119,6 +119,10 @@ Otherwise it will be sent as Markdown.
 ### `force_json`
 This setting takes a boolean and specifies whether the request body should be interpreted and parsed as json, even if the content type says otherwise.
 
+### `ignore_empty_messages`
+This setting takes a boolean and specifies whether a message should be sent if the message is empty. If `false` (the default) a message will be send for every
+successful message consumed by the webhook. If `true` if the template generates an empty message, no message is sent to the matrix client.  
+
 
 
 ## Formatting

@@ -6,3 +6,4 @@ auth_type:
 auth_token:
 markdown: false
 force_json: false
+ignore_empty_messages: false

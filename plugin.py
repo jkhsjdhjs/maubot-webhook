@@ -54,6 +54,7 @@ class Config(BaseProxyConfig):
         helper.copy("auth_token")
         helper.copy("markdown")
         helper.copy("force_json")
+        helper.copy("ignore_empty_messages")
 
 
 class WebhookPlugin(Plugin):
@@ -127,6 +128,11 @@ class WebhookPlugin(Plugin):
             return room
         if isinstance(message, Response):
             return message
+
+        if self.config["ignore_empty_messages"] and not message:
+            self.log.info(f"Not Sending message to room. {req} was successfully processed, "
+                          f"but the template generated an empty message.")
+            return Response()
 
         self.log.info(f"Sending message to room {room}: {message}")
         try:
