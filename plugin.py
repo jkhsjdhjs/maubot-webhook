@@ -128,11 +128,12 @@ class WebhookPlugin(Plugin):
         if isinstance(message, Response):
             return message
 
-        self.log.info(f"Sending message to room {room}: {message}")
-        try:
-            await (self.client.send_markdown if self.config["markdown"] else self.client.send_text)(room, message)
-        except Exception as e:
-            error_message = f"Failed to send message '{message}' to room {room}: {e}"
-            self.log.error(error_message)
-            return Response(status=500, text=error_message)
-        return Response()
+        if message:
+            self.log.info(f"Sending message to room {room}: {message}")
+            try:
+                await (self.client.send_markdown if self.config["markdown"] else self.client.send_text)(room, message)
+            except Exception as e:
+                error_message = f"Failed to send message '{message}' to room {room}: {e}"
+                self.log.error(error_message)
+                return Response(status=500, text=error_message)
+            return Response()
