@@ -62,8 +62,8 @@ class Config(BaseProxyConfig):
         if auth_type is not None:
             auth_type = auth_type.capitalize()
             if auth_type not in valid_auth_types:
-                raise ValueError(f"Invalid auth_type '{auth_type}' specified! Only {' and '.join(valid_auth_types)} "
-                                 "are supported.")
+                raise ValueError(f"Invalid auth_type '{auth_type}' specified! "
+                                 f"Must be one of: {', '.join(valid_auth_types)}")
             auth_token = helper.base["auth_token"]
             if auth_token is None:
                 raise ValueError("No auth_token specified!")
@@ -75,8 +75,8 @@ class Config(BaseProxyConfig):
         valid_message_formats = {"markdown", "plaintext", "html"}
         message_format = helper.base["message_format"]
         if message_format not in valid_message_formats:
-            raise ValueError(f"Invalid message_format '{message_format}' specified! Only "
-                             f"{' and '.join(valid_message_formats)} are supported.")
+            raise ValueError(f"Invalid message_format '{message_format}' specified! "
+                             f"Must be one of: {', '.join(valid_message_formats)}")
 
 
 class WebhookPlugin(Plugin):
