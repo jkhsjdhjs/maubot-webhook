@@ -110,11 +110,11 @@ If `auth_type` is `Basic`, this must be the username and password, separated by 
 If `auth_type` is `Bearer`, this is the token used for token bearer authorization, so requests must carry an `Authorization: Bearer <token>` header.
 
 
-### `markdown`
-This setting takes a boolean and specifies if the message should be sent as Markdown or as plaintext.
-If `false` (the default), the message will be sent as plaintext.
-Otherwise it will be sent as Markdown.
-
+### `message_format`
+This setting takes a boolean and specifies how a message will be sent..
+If `message_format` is `plaintext` (the default), the message will be sent as plaintext.
+If `message_format` is `markdown`, the message will be parsed as markdown and processed HTML returned.
+if `message_format` is `html`, it is expecting html code to be passed and will sent that.
 
 ### `force_json`
 This setting takes a boolean and specifies whether the request body should be interpreted and parsed as json, even if the content type says otherwise.

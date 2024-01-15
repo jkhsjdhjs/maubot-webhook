@@ -4,6 +4,6 @@ room: "!AAAAAAAAAAAAAAAAAA:example.com"
 message: "Hello world!"
 auth_type:
 auth_token:
-markdown: false
+message_format: "plaintext"
 force_json: false
 ignore_empty_messages: false

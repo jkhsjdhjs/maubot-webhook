@@ -45,6 +45,15 @@ class Config(BaseProxyConfig):
             if auth_type == "Basic" and ":" not in auth_token:
                 raise ValueError(f"Invalid auth_token '{auth_token}' specified! For HTTP basic auth, it must contain "
                                  "a username and a password, separated by a colon (<username>:<password>).")
+        if "markdown" in self:
+            if self["markdown"] is True:
+                helper.base["message_format"] = "markdown"
+
+        valid_message_formats = {"markdown", "plaintext", "html"}
+        message_format = self["message_format"]
+        if message_format not in valid_message_formats:
+            raise ValueError(f"Invalid message_format '{message_format}' specified! Only "
+                             f"{' and '.join(valid_message_formats)} are supported.")
 
         helper.copy("path")
         helper.copy("method")
@@ -52,7 +61,7 @@ class Config(BaseProxyConfig):
         helper.copy("message")
         helper.copy("auth_type")
         helper.copy("auth_token")
-        helper.copy("markdown")
+        helper.copy("message_format")
         helper.copy("force_json")
         helper.copy("ignore_empty_messages")
 
@@ -136,7 +145,12 @@ class WebhookPlugin(Plugin):
 
         self.log.info(f"Sending message to room {room}: {message}")
         try:
-            await (self.client.send_markdown if self.config["markdown"] else self.client.send_text)(room, message)
+            if self.config["message_format"] == 'markdown':
+                await self.client.send_markdown(room, message)
+            elif self.config["message_format"] == 'html':
+                await self.client.send_text(room, None, html=message)
+            else:
+                await self.client.send_text(room, message)
         except Exception as e:
             error_message = f"Failed to send message '{message}' to room {room}: {e}"
             self.log.error(error_message)
