@@ -29,32 +29,20 @@ import jinja2
 
 class Config(BaseProxyConfig):
     def do_update(self, helper: ConfigUpdateHelper) -> None:
+        # migrate in source config as it allows us to "decouple"
+        # the copy-part from the migration
+
+        # 0.1.0 -> 0.2.0 migration: auth_type added
+        # set auth_type as 'Bearer' if auth_token is set in source config
         if "auth_type" not in self and "auth_token" in self:
-            helper.base["auth_type"] = "Bearer"
+            self["auth_type"] = "Bearer"
 
-        valid_auth_types = {"Basic", "Bearer"}
-        auth_type = self["auth_type"]
-        if auth_type is not None:
-            auth_type = auth_type.capitalize()
-            if auth_type not in valid_auth_types:
-                raise ValueError(f"Invalid auth_type '{auth_type}' specified! Only {' and '.join(valid_auth_types)} "
-                                 "are supported.")
-            auth_token = self["auth_token"]
-            if auth_token is None:
-                raise ValueError(f"No auth_token specified!")
-            if auth_type == "Basic" and ":" not in auth_token:
-                raise ValueError(f"Invalid auth_token '{auth_token}' specified! For HTTP basic auth, it must contain "
-                                 "a username and a password, separated by a colon (<username>:<password>).")
-        if "markdown" in self:
-            if self["markdown"] is True:
-                helper.base["message_format"] = "markdown"
+        # 0.2.0 -> 0.3.0 migration: markdown option replaced by message_format
+        # set message_format as 'markdown' if markdown is true in source config
+        if "message_format" not in self and self["markdown"]:
+            self["message_format"] = "markdown"
 
-        valid_message_formats = {"markdown", "plaintext", "html"}
-        message_format = self["message_format"]
-        if message_format not in valid_message_formats:
-            raise ValueError(f"Invalid message_format '{message_format}' specified! Only "
-                             f"{' and '.join(valid_message_formats)} are supported.")
-
+        # copy values to base config
         helper.copy("path")
         helper.copy("method")
         helper.copy("room")
@@ -64,6 +52,31 @@ class Config(BaseProxyConfig):
         helper.copy("message_format")
         helper.copy("force_json")
         helper.copy("ignore_empty_messages")
+
+        # validate base config as it also contains default values
+        # for options not present in the source config.
+
+        # validate auth_type and auth_token
+        valid_auth_types = {"Basic", "Bearer"}
+        auth_type = helper.base["auth_type"]
+        if auth_type is not None:
+            auth_type = auth_type.capitalize()
+            if auth_type not in valid_auth_types:
+                raise ValueError(f"Invalid auth_type '{auth_type}' specified! Only {' and '.join(valid_auth_types)} "
+                                 "are supported.")
+            auth_token = helper.base["auth_token"]
+            if auth_token is None:
+                raise ValueError(f"No auth_token specified!")
+            if auth_type == "Basic" and ":" not in auth_token:
+                raise ValueError(f"Invalid auth_token '{auth_token}' specified! For HTTP basic auth, it must contain "
+                                 "a username and a password, separated by a colon (<username>:<password>).")
+
+        # validate message_format
+        valid_message_formats = {"markdown", "plaintext", "html"}
+        message_format = helper.base["message_format"]
+        if message_format not in valid_message_formats:
+            raise ValueError(f"Invalid message_format '{message_format}' specified! Only "
+                             f"{' and '.join(valid_message_formats)} are supported.")
 
 
 class WebhookPlugin(Plugin):
