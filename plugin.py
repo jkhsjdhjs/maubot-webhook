@@ -66,7 +66,7 @@ class Config(BaseProxyConfig):
                                  "are supported.")
             auth_token = helper.base["auth_token"]
             if auth_token is None:
-                raise ValueError(f"No auth_token specified!")
+                raise ValueError("No auth_token specified!")
             if auth_type == "Basic" and ":" not in auth_token:
                 raise ValueError(f"Invalid auth_token '{auth_token}' specified! For HTTP basic auth, it must contain "
                                  "a username and a password, separated by a colon (<username>:<password>).")
@@ -128,7 +128,7 @@ class WebhookPlugin(Plugin):
                     return unauthorized("Invalid username or password")
             elif auth_type == "Bearer" and auth_token != config_auth_token:
                 return unauthorized("Invalid authorization token")
-            self.log.debug(f"Auth token is valid")
+            self.log.debug("Auth token is valid")
 
         template_variables = {
             "path": dict(req.match_info),
@@ -153,7 +153,7 @@ class WebhookPlugin(Plugin):
 
         if self.config["ignore_empty_messages"] and not message:
             self.log.info(f"Not Sending message to room. {req} was successfully processed, "
-                          f"but the template generated an empty message.")
+                          "but the template generated an empty message.")
             return Response()
 
         self.log.info(f"Sending message to room {room}: {message}")
