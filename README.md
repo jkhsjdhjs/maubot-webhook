@@ -39,8 +39,9 @@ message: |
     {% endfor %}
 auth_type: Basic
 auth_token: abc:123
-markdown: true
+message_format: markdown
 force_json: false
+ignore_empty_messages: false
 ```
 
 ```bash
