@@ -96,9 +96,9 @@ class WebhookPlugin(Plugin):
         self.register_webhook()
 
     def register_webhook(self) -> None:
-        path = self.config["path"]
-        self.webapp.add_route(self.config["method"], path, self.handle_request)
-        self.log.info(f"Webhook available at: {self.webapp_url}{path}")
+        path, method = self.config["path"], self.config["method"]
+        self.webapp.add_route(method, path, self.handle_request)
+        self.log.info(f"Webhook available at: {method} {self.webapp_url}{path}")
 
     async def start(self) -> None:
         self.config.load_and_update()
