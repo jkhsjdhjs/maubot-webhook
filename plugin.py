@@ -85,11 +85,24 @@ class WebhookPlugin(Plugin):
     def get_config_class(cls) -> Type[BaseProxyConfig]:
         return Config
 
-    async def start(self) -> None:
-        self.config.load_and_update()
+    def on_external_config_update(self) -> None:
+        old_path, old_method = self.config["path"], self.config["method"]
+        super().on_external_config_update()
+        new_path, new_method = self.config["path"], self.config["method"]
+        if old_path == new_path and old_method == new_method:
+            return
+        self.log.debug("Path or method updated, restarting webhook...")
+        self.webapp.clear()
+        self.register_webhook()
+
+    def register_webhook(self) -> None:
         path = self.config["path"]
         self.webapp.add_route(self.config["method"], path, self.handle_request)
         self.log.info(f"Webhook available at: {self.webapp_url}{path}")
+
+    async def start(self) -> None:
+        self.config.load_and_update()
+        self.register_webhook()
 
     def substitute_config_template(self, config_key: str, variables: Dict) -> Union[str, Response]:
         try:

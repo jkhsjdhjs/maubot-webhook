@@ -76,9 +76,6 @@ The URL under which the webhook is made available is logged on instance startup,
 The path supports variable resources, which can be used to extract information from the request URL to format the [`room`](#room) and the [`message`](#message).
 Further information on this can be found in [the formatting section](#formatting).
 
-*The instance has to be restarted for changes to this setting to take effect:
-Click the `Running` switch to stop the instance, then save. Click the `Running` switch again to start it, then save again.*
-
 
 ### `method`
 Specifies the HTTP method that can be used on the given path.
@@ -86,9 +83,6 @@ Should be one of `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `HEAD`, `OPTIONS` or `
 This setting is case-insensitive.
 
 See also: https://docs.aiohttp.org/en/stable/web_reference.html?highlight=add_route#aiohttp.web.UrlDispatcher.add_route
-
-*The instance has to be restarted for changes to this setting to take effect:
-Click the `Running` switch to stop the instance, then save. Click the `Running` switch again to start it, then save again.*
 
 
 ### `room`
