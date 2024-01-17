@@ -2,17 +2,20 @@
 A [maubot](https://github.com/maubot/maubot) plugin to send messages using webhooks.
 
 
+
 ## Features
 - Jinja2 templating
 - JSON support
 - HTTP Basic and Token Bearer authorization
 
 
+
 ## Installation
 Either download an `.mbp` file from the [release assets](https://github.com/jkhsjdhjs/maubot-webhook/releases) or [build one yourself](#building).
 Then, [upload](https://docs.mau.fi/maubot/usage/basic.html#uploading-plugins) it to your maubot instance.
 
-Furthermore this plugin requires Jinja2 for template rendering. But since maubot already depends on Jinja2, you shouldn't have to install it manually.
+Furthermore, this plugin requires Jinja2 for template rendering. However, since maubot already depends on Jinja2, you shouldn't have to install it manually.
+
 
 
 ## Usage
@@ -23,8 +26,8 @@ Each instance of this plugin provides a single webhook.
 To create multiple webhooks, just instantiate this plugin multiple times.
 
 
-## Example
 
+## Example
 ```yaml
 path: /send
 method: POST
@@ -54,6 +57,7 @@ $ curl -X POST -H "Content-Type: application/json" -u abc:123 https://your.maubo
 ![Screenshot of the resulting message](https://screens.totally.rip/2023/02/63e0f862ca140.png)
 
 
+
 ## Configuration
 This plugin has the following settings you can configure:
 
@@ -62,7 +66,6 @@ This plugin has the following settings you can configure:
 The path the webhook will be available at.
 It must start with a `/` or be empty.
 It is relative to the webapp base URL of the instance:
-
 ```
 https://your.maubot.instance/_matrix/maubot/plugin/<instance ID>/<path>
 ```
@@ -111,13 +114,15 @@ If `auth_type` is `Bearer`, this is the token used for token bearer authorizatio
 
 
 ### `message_format`
-This setting takes a boolean and specifies how a message will be sent..
-If `message_format` is `plaintext` (the default), the message will be sent as plaintext.
-If `message_format` is `markdown`, the message will be parsed as markdown and processed HTML returned.
-if `message_format` is `html`, it is expecting html code to be passed and will sent that.
+The format the message is interpreted as. Must be one of:
+- `plaintext` (default)
+- `markdown`
+- `html`
+
 
 ### `force_json`
 This setting takes a boolean and specifies whether the request body should be interpreted and parsed as json, even if the content type says otherwise.
+
 
 ### `ignore_empty_messages`
 This setting takes a boolean and specifies whether a message should be sent if the message is empty. If `false` (the default) a message will be send for every
@@ -143,6 +148,7 @@ Use the `mbc` tool to build this plugin:
 ```
 mbc build
 ```
+
 Optionally use the `-u` switch to upload it to your maubot instance, if configured:
 ```
 mbc build -u
