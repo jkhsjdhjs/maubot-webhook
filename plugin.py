@@ -116,7 +116,7 @@ class WebhookPlugin(Plugin):
         self.log.debug(f"Got request {req}")
         config_auth_type = self.config["auth_type"]
 
-        def unauthorized(text):
+        def unauthorized(text: str) -> Response:
             return Response(status=401, headers={hdrs.WWW_AUTHENTICATE: config_auth_type}, text=text)
 
         if config_auth_type is not None:
