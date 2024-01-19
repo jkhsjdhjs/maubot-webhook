@@ -154,7 +154,7 @@ class WebhookPlugin(Plugin):
                 json = await req.json()
             except ValueError as e:
                 error_message = f"Failed to parse JSON: {e}"
-                return Response(status=401, text=error_message)
+                return Response(status=400, text=error_message)
             template_variables["json"] = json
 
         room = self.substitute_config_template("room", template_variables)
