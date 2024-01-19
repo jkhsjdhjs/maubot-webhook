@@ -2,8 +2,8 @@ path: "/send"
 method: "POST"
 room: "!AAAAAAAAAAAAAAAAAA:example.com"
 message: "Hello world!"
+message_format: "plaintext"
 auth_type:
 auth_token:
-message_format: "plaintext"
 force_json: false
 ignore_empty_messages: false

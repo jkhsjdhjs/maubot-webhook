@@ -47,14 +47,21 @@ class Config(BaseProxyConfig):
         helper.copy("method")
         helper.copy("room")
         helper.copy("message")
+        helper.copy("message_format")
         helper.copy("auth_type")
         helper.copy("auth_token")
-        helper.copy("message_format")
         helper.copy("force_json")
         helper.copy("ignore_empty_messages")
 
         # validate base config as it also contains default values
         # for options not present in the source config.
+
+        # validate message_format
+        valid_message_formats = {"markdown", "plaintext", "html"}
+        message_format = helper.base["message_format"]
+        if message_format not in valid_message_formats:
+            raise ValueError(f"Invalid message_format '{message_format}' specified! "
+                             f"Must be one of: {', '.join(valid_message_formats)}")
 
         # validate auth_type and auth_token
         valid_auth_types = {"Basic", "Bearer"}
@@ -70,13 +77,6 @@ class Config(BaseProxyConfig):
             if auth_type == "Basic" and ":" not in auth_token:
                 raise ValueError(f"Invalid auth_token '{auth_token}' specified! For HTTP basic auth, it must contain "
                                  "a username and a password, separated by a colon (<username>:<password>).")
-
-        # validate message_format
-        valid_message_formats = {"markdown", "plaintext", "html"}
-        message_format = helper.base["message_format"]
-        if message_format not in valid_message_formats:
-            raise ValueError(f"Invalid message_format '{message_format}' specified! "
-                             f"Must be one of: {', '.join(valid_message_formats)}")
 
 
 class WebhookPlugin(Plugin):

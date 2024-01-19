@@ -95,6 +95,13 @@ The message that is sent when the webhook is triggered.
 Supports formatting [as defined below](#formatting).
 
 
+### `message_format`
+The format the message is interpreted as. Must be one of:
+- `plaintext` (default)
+- `markdown`
+- `html`
+
+
 ### `auth_type`
 This can be used to protect a webhook against unauthorized access.
 Can be one of `Basic` for HTTP basic auth with username and password or `Bearer` for bearer token auth.
@@ -106,13 +113,6 @@ The username/password or token is specified via the [`auth_token`](#auth_token) 
 This specifies the username/password or token for authorization, depending on [`auth_type`](#auth_type).
 If `auth_type` is `Basic`, this must be the username and password, separated by a colon (\<username\>:\<password\>).
 If `auth_type` is `Bearer`, this is the token used for token bearer authorization, so requests must carry an `Authorization: Bearer <token>` header.
-
-
-### `message_format`
-The format the message is interpreted as. Must be one of:
-- `plaintext` (default)
-- `markdown`
-- `html`
 
 
 ### `force_json`
