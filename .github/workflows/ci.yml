@@ -2,16 +2,19 @@ name: ci
 
 on: [push, pull_request]
 
+env:
+  X_PYTHON_VERSION: 3.11
+
 jobs:
   pycodestyle:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.11
+    - name: Set up Python ${X_PYTHON_VERSION}
       uses: actions/setup-python@v4
       with:
-        python-version: "3.11"
+        python-version: "${X_PYTHON_VERSION}"
     - name: Install pycodestyle
       run: pip install pycodestyle
     - name: Check code style with PyCodestyle
