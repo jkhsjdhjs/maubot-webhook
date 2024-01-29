@@ -18,12 +18,13 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-from typing import Dict, Type, Union
+from typing import Dict, Optional, Type, Union
 
-from maubot import Plugin
+from maubot import Plugin, PluginWebApp
 from aiohttp import hdrs, BasicAuth
 from aiohttp.web import Request, Response
 from mautrix.util.config import BaseProxyConfig, ConfigUpdateHelper
+import mautrix.types
 import jinja2
 
 
@@ -80,6 +81,11 @@ class Config(BaseProxyConfig):
 
 
 class WebhookPlugin(Plugin):
+    # config and webapp are declared as Optional in the superclass,
+    # as not every plugin is configurable and offers a webapp.
+    # Re-declare these variables here for the typecheckers sake.
+    config: BaseProxyConfig
+    webapp: PluginWebApp
 
     @classmethod
     def get_config_class(cls) -> Type[BaseProxyConfig]:
@@ -140,16 +146,19 @@ class WebhookPlugin(Plugin):
 
     async def handle_request(self, req: Request) -> Response:
         self.log.debug(f"Got request {req}")
-        config_auth_type = self.config["auth_type"]
+        config_auth_type: Optional[str] = self.config["auth_type"]
 
         def unauthorized(text: str) -> Response:
-            return Response(status=401, headers={hdrs.WWW_AUTHENTICATE: config_auth_type}, text=text)
+            # config_auth_type can be None, but the function is not called in this case.
+            # Thus, we can ignore the type here.
+            return Response(status=401, headers={hdrs.WWW_AUTHENTICATE: config_auth_type},  # type: ignore[dict-item]
+                            text=text)
 
         if config_auth_type is not None:
             config_auth_type = config_auth_type.capitalize()
-            if hdrs.AUTHORIZATION not in req.headers:
+            auth_header: Optional[str] = req.headers.get(hdrs.AUTHORIZATION)
+            if auth_header is None:
                 return unauthorized("Missing authorization header")
-            auth_header = req.headers.get(hdrs.AUTHORIZATION)
             auth_header_split = auth_header.split(' ', 1)
             if len(auth_header_split) < 2:
                 return unauthorized("Invalid authorization header format")
@@ -183,11 +192,14 @@ class WebhookPlugin(Plugin):
                 return Response(status=400, text=error_message)
             template_variables["json"] = json
 
-        room = self.render_template("room", template_variables)
+        room: Union[str, Response] = self.render_template("room", template_variables)
         if isinstance(room, Response):
             return room
+        # RoomID is a str, wrap this here for the typechecker,
+        # since send_markdown() and send_text() expect a RoomID
+        room = mautrix.types.RoomID(room)
 
-        message = self.render_template("message", template_variables)
+        message: Union[str, Response] = self.render_template("message", template_variables)
         if isinstance(message, Response):
             return message
 
