@@ -87,13 +87,44 @@ class WebhookPlugin(Plugin):
 
     def on_external_config_update(self) -> None:
         old_path, old_method = self.config["path"], self.config["method"]
+        old_room, old_message = self.config["room"], self.config["message"]
         super().on_external_config_update()
         new_path, new_method = self.config["path"], self.config["method"]
-        if old_path == new_path and old_method == new_method:
-            return
-        self.log.debug("Path or method updated, restarting webhook...")
-        self.webapp.clear()
-        self.register_webhook()
+        new_room, new_message = self.config["room"], self.config["message"]
+        if old_path != new_path or old_method != new_method:
+            self.log.debug("Path or method changed, restarting webhook...")
+            self.webapp.clear()
+            self.register_webhook()
+        if old_room != new_room:
+            self.reload_template("room")
+        if old_message != new_message:
+            self.reload_template("message")
+
+    def reload_template(self, key: str) -> None:
+        self.log.debug(f"{key.capitalize()} changed, reloading template...")
+        self.load_template(key)
+        self.log.info(f"Successfully reloaded {key} template")
+
+    def load_template(self, key: str) -> None:
+        try:
+            self.templates[key] = jinja2.Template(self.config[key])
+        except jinja2.TemplateSyntaxError as e:
+            # avoid 'During handling of the above exception, another exception occurred'
+            # to keep the error message in the log as short as possible.
+            raise ValueError(f"Error in {key} template: {e}") from None
+
+    def render_template(self, key: str, variables: Dict) -> Union[str, Response]:
+        try:
+            # self.templates[key] is always defined:
+            # If an error occurs when reloading the template,
+            #  the old template is not replaced.
+            # If an error occurs when initially loading the template,
+            #  the webhook will not be registered and render_template() is not called.
+            return self.templates[key].render(variables)
+        except jinja2.UndefinedError as e:
+            error_message = f"Undefined variables in {key} template: {e}"
+            self.log.error(error_message)
+            return Response(status=500, text=error_message)
 
     def register_webhook(self) -> None:
         path, method = self.config["path"], self.config["method"]
@@ -101,16 +132,11 @@ class WebhookPlugin(Plugin):
         self.log.info(f"Webhook available at: {method} {self.webapp_url}{path}")
 
     async def start(self) -> None:
+        self.templates: Dict[str, jinja2.Template] = {}
         self.config.load_and_update()
+        self.load_template("room")
+        self.load_template("message")
         self.register_webhook()
-
-    def substitute_config_template(self, config_key: str, variables: Dict) -> Union[str, Response]:
-        try:
-            return jinja2.Template(self.config[config_key]).render(variables)
-        except (jinja2.TemplateSyntaxError, jinja2.UndefinedError) as e:
-            error_message = f"Error in {config_key} template: {e}"
-            self.log.error(error_message)
-            return Response(status=500, text=error_message)
 
     async def handle_request(self, req: Request) -> Response:
         self.log.debug(f"Got request {req}")
@@ -157,10 +183,11 @@ class WebhookPlugin(Plugin):
                 return Response(status=400, text=error_message)
             template_variables["json"] = json
 
-        room = self.substitute_config_template("room", template_variables)
-        message = self.substitute_config_template("message", template_variables)
+        room = self.render_template("room", template_variables)
         if isinstance(room, Response):
             return room
+
+        message = self.render_template("message", template_variables)
         if isinstance(message, Response):
             return message
 
