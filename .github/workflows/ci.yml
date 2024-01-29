@@ -19,3 +19,17 @@ jobs:
       run: pip install pycodestyle
     - name: Check code style with PyCodestyle
       run: pycodestyle --count --max-line-length 120 plugin.py
+
+  mypy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{X_PYTHON_VERSION}}
+      uses: actions/setup-python@v4
+      with:
+        python-version: "${{X_PYTHON_VERSION}}"
+    - name: Install maubot & mypy
+      run: pip install maubot mypy
+    - name: Check typing with mypy
+      run: mypy plugin.py
