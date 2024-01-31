@@ -1,5 +1,5 @@
 # maubot-webhook - A maubot plugin to send messages using webhooks
-# Copyright (C) 2022 maubot-webhook Contributors
+# Copyright (C) 2024 maubot-webhook Contributors
 #
 # This file is part of maubot-webhook.
 #
