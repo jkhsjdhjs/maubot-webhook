@@ -37,9 +37,9 @@ message: |
     {% for text in json.list %}
     - {{ text }}
     {% endfor %}
+message_format: markdown
 auth_type: Basic
 auth_token: abc:123
-message_format: markdown
 force_json: false
 ignore_empty_messages: false
 ```
