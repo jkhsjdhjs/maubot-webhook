@@ -102,6 +102,12 @@ The format the message is interpreted as. Must be one of:
 - `html`
 
 
+### `message_type`
+The type the message is sent as. Must be one of:
+- `m.text` (default)
+- `m.notice`
+
+
 ### `auth_type`
 This can be used to protect a webhook against unauthorized access.
 Can be one of `Basic` for HTTP basic auth with username and password or `Bearer` for bearer token auth.
