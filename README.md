@@ -38,6 +38,7 @@ message: |
     - {{ text }}
     {% endfor %}
 message_format: markdown
+message_type: m.text
 auth_type: Basic
 auth_token: abc:123
 force_json: false
