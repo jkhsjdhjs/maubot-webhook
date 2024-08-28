@@ -158,7 +158,7 @@ class WebhookPlugin(Plugin):
         def unauthorized(text: str) -> Response:
             # config_auth_type can be None, but the function is not called in this case.
             # Thus, we can ignore the type here.
-            return Response(status=401, headers={hdrs.WWW_AUTHENTICATE: config_auth_type},  # type: ignore[dict-item]
+            return Response(status=401, headers={hdrs.WWW_AUTHENTICATE: config_auth_type},  # type: ignore[arg-type]
                             text=text)
 
         if config_auth_type is not None:
