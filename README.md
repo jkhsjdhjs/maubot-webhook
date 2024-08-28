@@ -38,6 +38,7 @@ message: |
     - {{ text }}
     {% endfor %}
 message_format: markdown
+message_type: m.text
 auth_type: Basic
 auth_token: abc:123
 force_json: false
@@ -100,6 +101,12 @@ The format the message is interpreted as. Must be one of:
 - `plaintext` (default)
 - `markdown`
 - `html`
+
+
+### `message_type`
+The type the message is sent as. Must be one of:
+- `m.text` (default)
+- `m.notice`
 
 
 ### `auth_type`

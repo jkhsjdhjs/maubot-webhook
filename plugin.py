@@ -49,6 +49,7 @@ class Config(BaseProxyConfig):
         helper.copy("room")
         helper.copy("message")
         helper.copy("message_format")
+        helper.copy("message_type")
         helper.copy("auth_type")
         helper.copy("auth_token")
         helper.copy("force_json")
@@ -63,6 +64,12 @@ class Config(BaseProxyConfig):
         if message_format not in valid_message_formats:
             raise ValueError(f"Invalid message_format '{message_format}' specified! "
                              f"Must be one of: {', '.join(valid_message_formats)}")
+        # validate message_type
+        valid_message_types = {"m.text", "m.notice"}
+        message_type = helper.base["message_type"]
+        if message_type not in valid_message_types:
+            raise ValueError(f"Invalid message_type '{message_type}' specified! "
+                             f"Must be one of: {', '.join(valid_message_types)}")
 
         # validate auth_type and auth_token
         valid_auth_types = {"Basic", "Bearer"}
@@ -208,14 +215,15 @@ class WebhookPlugin(Plugin):
                           "but the template generated an empty message.")
             return Response()
 
-        self.log.info(f"Sending message to room {room}: {message}")
+        msgtype = self.config["message_type"]
+        self.log.info(f"Sending message ({msgtype}) to room {room}: {message}")
         try:
             if self.config["message_format"] == 'markdown':
-                await self.client.send_markdown(room, message)
+                await self.client.send_markdown(room, message, msgtype=msgtype)
             elif self.config["message_format"] == 'html':
-                await self.client.send_text(room, None, html=message)
+                await self.client.send_text(room, None, html=message, msgtype=msgtype)
             else:
-                await self.client.send_text(room, message)
+                await self.client.send_text(room, message, msgtype=msgtype)
         except Exception as e:
             error_message = f"Failed to send message '{message}' to room {room}: {e}"
             self.log.error(error_message)

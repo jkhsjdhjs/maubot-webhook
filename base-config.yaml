@@ -3,6 +3,7 @@ method: "POST"
 room: "!AAAAAAAAAAAAAAAAAA:example.com"
 message: "Hello world!"
 message_format: "plaintext"
+message_type: "m.text"
 auth_type:
 auth_token:
 force_json: false
