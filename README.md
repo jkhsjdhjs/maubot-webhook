@@ -158,7 +158,7 @@ mbc build -u
 
 Since `.mbp` files are just zip archives with a different name, you can also just zip the files of this repository:
 ```
-zip -9r plugin.mbp *
+zip -9r webhook.mbp *
 ```
 
 
