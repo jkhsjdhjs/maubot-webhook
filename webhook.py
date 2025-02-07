@@ -142,7 +142,7 @@ class WebhookPlugin(Plugin):
     def register_webhook(self) -> None:
         path, method = self.config["path"], self.config["method"]
         self.webapp.add_route(method, path, self.handle_request)
-        self.log.info(f"Webhook available at: {method} {self.webapp_url}{path}")
+        self.log.info(f"Webhook available at: {method} {self.webapp_url}{path.lstrip('/')}")
 
     async def start(self) -> None:
         self.templates: Dict[str, jinja2.Template] = {}
