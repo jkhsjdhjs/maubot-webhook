@@ -144,6 +144,16 @@ For more information on Jinja2 templates please refer to https://jinja.palletspr
 For more information on URL path templates in aiohttp, see https://docs.aiohttp.org/en/stable/web_quickstart.html#variable-resources.
 
 
+### Escaping
+HTML-escaping is performed on all values automatically.
+To prevent a value from being escaped, use the `safe` filter: `{{ foo | safe }}`
+Refer to the Jinja2 docs for more information on autoescaping: https://jinja.palletsprojects.com/en/stable/templates/#working-with-automatic-escaping
+
+> [!WARNING]
+> While HTML is escaped automatically, markdown is not. It needs to be escaped manually via the `escape_md` filter: `{{ foo | escape_md }}`
+> This behavior will eventually change when Jinja2 allows custom autoescape functions (see [#13](https://github.com/jkhsjdhjs/maubot-webhook/issues/13) for more information).
+
+
 
 ## Building
 Use the `mbc` tool to build this plugin:
@@ -160,6 +170,7 @@ Since `.mbp` files are just zip archives with a different name, you can also jus
 ```
 zip -9r webhook.mbp *
 ```
+
 
 
 ## License

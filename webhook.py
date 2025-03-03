@@ -26,6 +26,13 @@ from aiohttp.web import Request, Response
 from mautrix.util.config import BaseProxyConfig, ConfigUpdateHelper
 import mautrix.types
 import jinja2
+import re
+
+
+def escape_md(value: str) -> str:
+    # based on https://github.com/tulir/gomuks/blob/e0f107f0285936964afeeec8f4efbb312d9e3c22/web/src/util/markdown.ts
+    # replacing < and > is not necessary as HTML autoescaping is performed anyway
+    return re.sub(r'([\\`*_[\]])', r'\\\1', value)
 
 
 class Config(BaseProxyConfig):
@@ -120,7 +127,7 @@ class WebhookPlugin(Plugin):
 
     def load_template(self, key: str) -> None:
         try:
-            self.templates[key] = jinja2.Template(self.config[key])
+            self.templates[key] = self.jinja_env.from_string(self.config[key])
         except jinja2.TemplateSyntaxError as e:
             # avoid 'During handling of the above exception, another exception occurred'
             # to keep the error message in the log as short as possible.
@@ -146,6 +153,9 @@ class WebhookPlugin(Plugin):
 
     async def start(self) -> None:
         self.templates: Dict[str, jinja2.Template] = {}
+        self.jinja_env: jinja2.Environment = jinja2.Environment(autoescape=True)
+        self.jinja_env.filters["escape_md"] = escape_md
+
         self.config.load_and_update()
         self.load_template("room")
         self.load_template("message")
