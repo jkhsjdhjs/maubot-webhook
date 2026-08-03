@@ -128,8 +128,11 @@ This setting takes a boolean and specifies whether the request body should be in
 
 
 ### `ignore_empty_messages`
-This setting takes a boolean and specifies whether a message should be sent if the message is empty. If `false` (the default) a message will be send for every
-successful message consumed by the webhook. If `true` if the template generates an empty message, no message is sent to the matrix client.  
+This setting takes a boolean and specifies whether a message should be sent if template evaluation produces an empty string.
+A string containing only [whitespace characters](https://docs.python.org/3/library/stdtypes.html#str.isspace) is also considered empty.
+
+If `false` (the default) a message will be send for every successful message consumed by the webhook.
+If `true` and the template generates an empty message, no message is sent to the matrix client. Non-empty messages are sent as usual.  
 
 
 

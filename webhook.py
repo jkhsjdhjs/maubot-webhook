@@ -209,8 +209,8 @@ class WebhookPlugin(Plugin):
         if isinstance(message, Response):
             return message
 
-        if self.config["ignore_empty_messages"] and not message:
-            self.log.info(f"Not Sending message to room. {req} was successfully processed, "
+        if self.config["ignore_empty_messages"] and not message.strip():
+            self.log.info(f"Not sending message to room. {req} was successfully processed, "
                           "but the template generated an empty message.")
             return Response()
 
